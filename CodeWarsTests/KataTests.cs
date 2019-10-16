@@ -235,7 +235,8 @@ namespace CodeWars.Tests
             string r = new Regex("\\)([^\\d])").Replace(new Regex("\\)$").Replace(new Regex("\\]|\\}").Replace(new Regex("\\[|\\{").Replace(s, "("), ")"), ")1"), new MatchEvaluator(m => ")1" + m.Groups[1].Value));
             Regex repeatPattern = new Regex("\\(([^()]+)\\)(\\d+)");
             MatchEvaluator unroll = new MatchEvaluator(m => String.Join("", Enumerable.Repeat(m.Groups[1].Value, Int32.Parse(m.Groups[2].Value)).ToArray()));
-            while (repeatPattern.IsMatch(r)) r = repeatPattern.Replace(r, unroll);
+            while (repeatPattern.IsMatch(r))
+                r = repeatPattern.Replace(r, unroll);
             r = new Regex("([A-Z][a-z]*)(\\d+)").Replace(r, unroll);
             string[] a = new Regex("[A-Z][a-z]*").Matches(r).OfType<Match>().Select(m => m.Value).ToArray();
             string[] elements = new HashSet<string>(a).ToArray();
@@ -252,11 +253,19 @@ namespace CodeWars.Tests
         [TestMethod()]
         public void HugeRandomFictionalMoleculeTest()
         {
-            Console.WriteLine("One super-complex random \"chemical formula\" ;)");
+            Debug.WriteLine("One super-complex random \"chemical formula\" ;)");
             string s = RandomMolecule();
-            Console.WriteLine("Testing for chemical formula " + s);
+            Debug.WriteLine("Testing for chemical formula " + s);
+            var sw = Stopwatch.StartNew();
             var expected = Solution(s);
+            sw.Stop();
+            Debug.WriteLine($"===>>> CodeWars Solution: {sw.ElapsedMilliseconds} ms."); 
+
+            sw = Stopwatch.StartNew();
             var received = Kata.ParseMolecule(s);
+            sw.Stop();
+            Debug.WriteLine($"===>> My Solution: {sw.ElapsedMilliseconds} ms.");
+            
             CollectionAssert.AreEquivalent(expected, received);
         }
 

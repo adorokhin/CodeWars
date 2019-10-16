@@ -139,7 +139,7 @@ namespace CodeWars
             char c;
 
             formula = formula.Replace("{", "(").Replace("[", "(").Replace("}", ")").Replace("]", ")");
-            Debug.WriteLine($"Formula {formula}");
+            //Debug.WriteLine($"Formula {formula}");
 
             for (int i = 0; i < arr.Count; i++)
             {
@@ -177,7 +177,7 @@ namespace CodeWars
             multiplier = GetMultiplier(arr, ref endPosition);
             outerMultiplier *= multiplier;
 
-            Debug.WriteLine($@"-- {string.Join("", groupArr)}");
+            //Debug.WriteLine($@"-- {string.Join("", groupArr)}");
 
             for (int i = 0; i < groupArr.Count; i++)
             {
@@ -214,7 +214,7 @@ namespace CodeWars
         {
             var element = GetElement(arr, ref i);
             var multiplier = GetMultiplier(arr, ref i) * outerMultiplier;
-            Debug.WriteLine($"{element}{multiplier}");
+            //Debug.WriteLine($"{element}{multiplier}");
             ModifyElement(elements, element, multiplier);
         }
 
@@ -243,13 +243,6 @@ namespace CodeWars
                     break;
                 }
             }
-
-            //if ((i+1) < arr.Count)
-            //{
-            //    if (Char.IsLower(arr[i + 1]))
-            //        element += arr[++i].ToString();
-            //}
-
             return element;
         }
 
