@@ -11,14 +11,6 @@ namespace CodeWars
     {
         #region ParseMolecule
 
-        /*
-        Kata.ParseMolecule("H2O"); // => new Dictionary<string, int> {{"H", 2}, {"O", 1}}
-        Kata.ParseMolecule("Mg(OH)2"); // => new Dictionary<string, int> {{"Mg", 1}, {"O", 2}, {"H", 2}}
-        Kata.ParseMolecule("K4[ON(SO3)2]2"); // => new Dictionary<string, int> {{"K", 4}, {"O", 14}, {"N", 2}, {"S", 4}}
-        As you can see, some formulas have brackets in them.The index outside the brackets tells you that you have to multiply count of each atom inside the bracket on this index.For example, in Fe(NO3)2 you have one iron atom, two nitrogen atoms and six oxygen atoms.
-        Note that brackets may be round, square or curly and can also be nested.Index after the braces is optional.
-        */
-
         public static Dictionary<string, string> elements => new Dictionary<string, string>()
             {{ "H", "Hydrogen"},
                 {"He",  "Helium"},
@@ -143,53 +135,87 @@ namespace CodeWars
         {
             var elements = new Dictionary<string, int>();
             var outerMultiplier = 1;
-            int endPosition = 0;
             var arr = formula.ToCharArray().ToList();
-            while (arr != null && arr.Any())
+            char c;
+
+            formula = formula.Replace("{", "(").Replace("[", "(").Replace("}", ")").Replace("]", ")");
+            Debug.WriteLine($"Formula {formula}");
+
+            for (int i = 0; i < arr.Count; i++)
             {
-                ParseBracketedGroup(
-                    elements
-                    , arr
-                    , outerMultiplier
-                    , ref endPosition
-                );
-
-                arr = arr.Skip(endPosition+1).ToList();
+                c = arr[i];
+                if (IsBracket(c))
+                {
+                    ParseBracketedGroup(c, elements, arr, outerMultiplier, ref i);
+                }
+                else
+                {
+                    ParseSingleElement(elements, arr, outerMultiplier, ref i);
+                }
             }
-
+            /*
+            Debug.WriteLine("========>");
+            elements.ToList().ForEach(x => {Debug.Write($"{x.Key}-{x.Value} "); });
+            Debug.WriteLine("<========");
+            */
             return elements;
         }
 
-        public static void ParseBracketedGroup(Dictionary<string, int> elements, List<char> arr, int outerMultiplier, ref int endPosition, bool recursing = false)
+        public static void ParseBracketedGroup(char openingBracket, Dictionary<string, int> elements, List<char> arr, int outerMultiplier, ref int endPosition, bool recursing = false)
         {
             if (arr == null || !arr.Any())
                 return;
 
-            int end = 0, multiplier=1;
-            string element;
-            char c = arr[0];
-            if (IsBracket(c))
+            int multiplier = 1;
+            char closingBracket = GetClosingBracket(openingBracket);
+            int closingBracketIndex = GetClosingBracketPosition(arr, endPosition, closingBracket, openingBracket);
+            if (closingBracketIndex <= 0)
+                throw new Exception($"Closing Bracket {closingBracket} not found in {string.Join("", arr)}.");
+
+            var groupArr = arr.Skip(endPosition + 1).Take((closingBracketIndex - endPosition) - 1).ToList();
+            endPosition = closingBracketIndex;
+            multiplier = GetMultiplier(arr, ref endPosition);
+            outerMultiplier *= multiplier;
+
+            Debug.WriteLine($@"-- {string.Join("", groupArr)}");
+
+            for (int i = 0; i < groupArr.Count; i++)
             {
-                var closingBracketIndex = arr.IndexOf(GetClosingBracket(c));
-                end = closingBracketIndex;
-                multiplier = GetMultiplier(arr, ref end);
-                outerMultiplier *= multiplier;
-                arr = arr.Skip(1).Take(closingBracketIndex-1).ToList();
-                if (!recursing)
-                    endPosition += end;
-                ParseBracketedGroup(elements, arr, outerMultiplier, ref endPosition, recursing: true);
+                var c = groupArr[i];
+                if (IsBracket(c))
+                {
+                    ParseBracketedGroup(c, elements, groupArr, outerMultiplier, ref i, recursing: true);
+                }
+                else
+                {
+                    ParseSingleElement(elements, groupArr, outerMultiplier, ref i);
+                }
             }
-            else
+        }
+
+        public static int GetClosingBracketPosition(List<char> arr, int endPosition, char closingBracket, char openingBracket)
+        {
+            int openingBracketCount = 0;
+            int i = endPosition;
+            for (i = endPosition; i < arr.Count; i++)
             {
-                element = GetElement(c, arr, ref end);
-                multiplier = GetMultiplier(arr, ref end);
-                ModifyElement(elements, element, outerMultiplier * multiplier);
-                arr = arr.Skip(element.Length + multiplier.ToString().Length).ToList();
-                if (!recursing)
-                    endPosition += end;
-                if(recursing)
-                    ParseBracketedGroup(elements, arr, outerMultiplier, ref endPosition, recursing: true);
+                var c = arr[i];
+                if (c == openingBracket)
+                    openingBracketCount++;
+                if (c == closingBracket)
+                    openingBracketCount--;
+                if (openingBracketCount == 0)
+                    break;
             }
+            return i;
+        }
+
+        private static void ParseSingleElement(Dictionary<string, int> elements, List<char> arr, int outerMultiplier, ref int i)
+        {
+            var element = GetElement(arr, ref i);
+            var multiplier = GetMultiplier(arr, ref i) * outerMultiplier;
+            Debug.WriteLine($"{element}{multiplier}");
+            ModifyElement(elements, element, multiplier);
         }
 
         private static void ModifyElement(Dictionary<string, int> dictResults, string element, int multiplier)
@@ -200,14 +226,30 @@ namespace CodeWars
                 dictResults[element] = multiplier;
         }
 
-        public static string GetElement(char c, List<char> arr, ref int i)
+        public static string GetElement(List<char> arr, ref int i)
         {
-            string element = c.ToString();
-            if ((i+1) < arr.Count)
+            string element = arr[i].ToString();
+            i++;
+            while (i < arr.Count)
             {
-                if (Char.IsLower(arr[i + 1]))
-                    element += arr[i++].ToString();
+                if (Char.IsLower(arr[i]))
+                {
+                    element += arr[i].ToString();
+                    i++;
+                }
+                else
+                {
+                    i--;
+                    break;
+                }
             }
+
+            //if ((i+1) < arr.Count)
+            //{
+            //    if (Char.IsLower(arr[i + 1]))
+            //        element += arr[++i].ToString();
+            //}
+
             return element;
         }
 
@@ -254,12 +296,6 @@ namespace CodeWars
             return endBracket;
 
         }
-
-
-        public static void ProcessChunk(string formula, Dictionary<string, int> dictResults)
-        {
-        }
-
         #endregion
 
         #region DuplicateEncoder
