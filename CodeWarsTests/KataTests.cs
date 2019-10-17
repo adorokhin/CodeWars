@@ -259,13 +259,13 @@ namespace CodeWars.Tests
             var sw = Stopwatch.StartNew();
             var expected = Solution(s);
             sw.Stop();
-            Debug.WriteLine($"===>>> CodeWars Solution: {sw.ElapsedMilliseconds} ms."); 
+            Debug.WriteLine($"===>>> CodeWars Solution: {sw.ElapsedMilliseconds} ms.");
 
             sw = Stopwatch.StartNew();
             var received = Kata.ParseMolecule(s);
             sw.Stop();
             Debug.WriteLine($"===>> My Solution: {sw.ElapsedMilliseconds} ms.");
-            
+
             CollectionAssert.AreEquivalent(expected, received);
         }
 
@@ -288,6 +288,51 @@ namespace CodeWars.Tests
             indx = Kata.GetClosingBracketPosition(arr, 7, ']', '[');
             Assert.AreEqual(indx, 9);
 
+        }
+
+        [TestMethod()]
+        public void StripCommentsTest()
+        {
+            var splt = string.Concat(Environment.NewLine, new string('-', 80), Environment.NewLine);
+            var expected = "apples, pears\ngrapes\nbananas";
+            var provided = "apples, pears # and bananas\ngrapes\nbananas !apples";
+            var comments = new string[] { "#", "!" };
+            var solution = Kata.StripComments(provided, comments);
+            Debug.WriteLine($"{splt}>>>{expected}<<<{splt}{Environment.NewLine}{Environment.NewLine}>>>{solution}<<<{splt}");
+            Assert.AreEqual(expected, solution);
+
+            expected = "a\nc\nd";
+            provided = "a #b\nc\nd $e f g";
+            comments = new string[] { "#", "$" };
+            solution = Kata.StripComments(provided, comments);
+            Debug.WriteLine($"{splt}>>>{expected}<<<{splt}{Environment.NewLine}{Environment.NewLine}>>>{solution}<<<{splt}");
+            Assert.AreEqual(expected, solution);
+
+            expected = string.Empty;
+            provided = "a";
+            comments = new string[] { "a" };
+            solution = Kata.StripComments(provided, comments);
+            Debug.WriteLine($"{splt}>>>{expected}<<<{splt}{Environment.NewLine}{Environment.NewLine}>>>{solution}<<<{splt}");
+            Assert.AreEqual(expected, solution);
+
+
+            expected = "\n\n\n\n";
+            provided = "\n\n\n\n";
+            comments = new string[] { "#", "$" };
+            solution = Kata.StripComments(provided, comments);
+            Debug.WriteLine($"{splt}>>>{expected}<<<{splt}{Environment.NewLine}{Environment.NewLine}>>>{solution}<<<{splt}");
+            Assert.AreEqual(expected, solution);
+
+        }
+
+        [TestMethod()]
+        public void MoveZeroesTest()
+        {
+            var expected = new int[] { 1, 2, 1, 1, 3, 1, 0, 0, 0, 0 };
+            var provided = new int[] { 1, 2, 0, 1, 0, 1, 0, 3, 0, 1 };
+            var solution = Kata.MoveZeroes(provided);
+
+            CollectionAssert.AreEquivalent(expected, solution);
         }
     }
 

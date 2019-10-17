@@ -9,6 +9,48 @@ namespace CodeWars
 {
     public static class Kata
     {
+        #region MoveZeroes
+        public static int[] MoveZeroes_ILike(int[] arr)
+        {
+            return arr.OrderBy(x => x == 0).ToArray();
+        }
+
+        public static int[] MoveZeroes(int[] arr)
+        {
+            if (arr == null)
+                return null;
+            var result = new int[arr.Length];
+            var j = 0;
+            foreach (var i in arr)
+            {
+                if(i != 0)
+                    result[j++] = i;
+            }
+            return result;
+        }
+        #endregion
+        #region StripComments
+        public static string StripComments(string text, string[] commentSymbols)
+        {
+            if (string.IsNullOrEmpty(text))
+                return string.Empty;
+            var lines = text.Split(new char[] { '\n' });
+            var results = new List<string>();
+            foreach (var line in lines)
+            {
+                var buff = line.TrimEnd();
+                foreach (var commentSymbol in commentSymbols)
+                {
+                    var index = line.IndexOf(commentSymbol);
+                    if( index != -1 )
+                        buff = buff.Substring(0, index);
+                }
+                results.Add($"{buff.TrimEnd()}");
+            }
+            return string.Join("\n", results.ToArray());
+        }
+        #endregion
+
         #region ParseMolecule
 
         public static Dictionary<string, string> elements => new Dictionary<string, string>()
