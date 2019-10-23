@@ -44,6 +44,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Katas.cs" />
+    <Compile Include="Katas\HumanTimeFormat.cs" />
+    <Compile Include="Katas\Sudoku.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

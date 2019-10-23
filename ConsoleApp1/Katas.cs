@@ -29,6 +29,7 @@ namespace CodeWars
             return result;
         }
         #endregion
+
         #region StripComments
         public static string StripComments(string text, string[] commentSymbols)
         {

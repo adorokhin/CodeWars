@@ -335,6 +335,4 @@ namespace CodeWars.Tests
             CollectionAssert.AreEquivalent(expected, solution);
         }
     }
-
-
 }
