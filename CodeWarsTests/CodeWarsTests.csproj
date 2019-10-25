@@ -58,6 +58,7 @@
   <ItemGroup>
     <Compile Include="Katas\HumanTimeFormatTests.cs" />
     <Compile Include="Katas\SudokuTests.cs" />
+    <Compile Include="Katas\WeightSortTests.cs" />
     <Compile Include="KataTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

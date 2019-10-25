@@ -17,14 +17,18 @@ namespace CodeWars
         {
             string result = string.Empty;
             if (part != 0)
-                result =  $"{part} {sPart}" + (part > 0 ? "s" : "");
+                result =  $"{part} {sPart}" + (part > 1 ? "s" : "");
             return result;
         }
 
         public static string formatDuration(int seconds)
         {
+            string result = string.Empty;
             if (seconds == 0)
-                return "now";
+            {
+                result = "now";
+                return result;
+            }
 
             //365 days and a day is 24 hours
             int years = seconds / SECONDS_IN_YEAR;
@@ -42,13 +46,16 @@ namespace CodeWars
             var sM = PluralizePart(minutes, "minute");
             var sS = PluralizePart(seconds, "second");
 
-            var time = sH;
-
-            if(sD != string.Empty)
-            var date = $"{sY}{(sY != "" ? ", " : "")}";
-                
-
-            return "";
+            result += $"{sY}{((years > 0 && days > 0) ? ", " : "")}";
+            result += $"{sD}{((days > 0 && hours > 0) ? ", " : "")}";
+            result += $"{sH}{((hours > 0 && minutes > 0) ? ", " : "")}";
+            result += $"{sM}{((minutes > 0 && seconds > 0) ? ", " : "")}";
+            result += sS;
+            var index = result.LastIndexOf(", ");
+            if(index != -1)
+                result = result.Substring(0, index) + " and " + result.Substring(index + 2);
+            return result;
+           
         }
     }
 }
